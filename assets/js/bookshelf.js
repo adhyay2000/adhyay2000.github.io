@@ -38,7 +38,7 @@ const LIBRARY = {
           color: "#986e5a",
           description:
             "Spacefaring botanists race to revive a dying colony world. A quiet sci-fi about memory, migration, and second chances.",
-          pdf: "sample.pdf" // demo file name you can replace
+          pdf: "assets/data/2402.06196v3.pdf" // demo file name you can replace
         }
       ]
     },
