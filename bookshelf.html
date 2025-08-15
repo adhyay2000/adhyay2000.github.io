@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>My Bookshelf</title>
+  <link rel="stylesheet" href="assets/css/main.css"> <!-- existing site CSS (optional) -->
+  <link rel="stylesheet" href="assets/css/bookshelf.css">
+</head>
+<body class="is-preload">
+  <div id="bookshelf-app">
+    <header class="bs-header">
+      <h1>My Bookshelf</h1>
+      <div class="bs-search">
+        <input id="bs-search-input" type="search" placeholder="Search title or author…" />
+      </div>
+    </header>
+
+    <nav class="bs-tabs" id="bs-tabs"></nav>
+
+    <main id="bs-shelves" class="bs-shelves"></main>
+  </div>
+
+  <!-- Modal -->
+  <div id="bs-modal" class="bs-modal" aria-hidden="true">
+    <div class="bs-modal__backdrop" data-close></div>
+    <div class="bs-modal__dialog" role="dialog" aria-modal="true" aria-labelledby="bs-modal-title">
+      <button class="bs-modal__close" data-close aria-label="Close">×</button>
+      <div class="bs-modal__body" id="bs-modal-body"></div>
+    </div>
+  </div>
+
+  <script src="assets/js/bookshelf.js"></script>
+</body>
+</html>
