@@ -1,26 +1,40 @@
 const LIBRARY = {
   shelves: [
     {
-      id: "papers",
-      name: "Papers",
+      id: "Research Papers",
+      name: "Research Papers",
       books: [
         {
           id: "paper-1",
-          title: "The Silent Forest",
-          author: "A. K. Rao",
-          year: 2021,
+          title: "Large Language Models: A Survey",
+          author: "Shervin Minaee, Tomas Mikolov, Narjes Nikzad, Meysam Chenaghlu, Richard Socher, Xavier Amatriain, Jianfeng Gao",
+          year: 2024,
           color: "#b26e4b",
-          description: "A coming-of-age tale...",
-          pdf: "assets/data/2402.06196v3.pdf"
+          description: "Large Language Models (LLMs) have drawn a lot of attention due to their strong performance on a wide range of natural language tasks, since the release of ChatGPT in November 2022. LLMs' ability of general-purpose language understanding and generation is acquired by training billions of model's parameters on massive amounts of text data, as predicted by scaling laws \cite{kaplan2020scaling,hoffmann2022training}. The research area of LLMs, while very recent, is evolving rapidly in many different ways. In this paper, we review some of the most prominent LLMs, including three popular LLM families (GPT, LLaMA, PaLM), and discuss their characteristics, contributions and limitations. We also give an overview of techniques developed to build, and augment LLMs. We then survey popular datasets prepared for LLM training, fine-tuning, and evaluation, review widely used LLM evaluation metrics, and compare the performance of several popular LLMs on a set of representative benchmarks. Finally, we conclude the paper by discussing open challenges and future research directions.",
+          pdf: "https://arxiv.org/pdf/2402.06196.pdf"
+        },
+      ]
+    },
+    {
+      id: "non-fiction",
+      name: "Non-Fiction",
+      books: [
+        {
+          id: "nf-1",
+          title: "The Art of Deep Work",
+          author: "Dr. Sarah Kim",
+          year: 2023,
+          color: "#6b4e7a",
+          description: "An exploration of focus and productivity in the digital age, offering practical strategies for cultivating concentration and achieving meaningful work.",
+          pdf: "https://arxiv.org/pdf/2401.12345.pdf"
         },
         {
-          id: "fic-3",
-          title: "River of Stars",
-          author: "M. Banerjee",
-          year: 2023,
-          color: "#986e5a",
-          description: "Spacefaring botanists...",
-          pdf: "sample.pdf"
+          id: "nf-2", 
+          title: "Climate Futures",
+          author: "R. Patel & J. Williams",
+          year: 2024,
+          color: "#5a7c4e",
+          description: "A comprehensive look at emerging technologies and social innovations that could help address climate change while building a more sustainable future."
         }
       ]
     }
@@ -46,9 +60,7 @@ const tabReader  = $('#tab-reader');
 const panelDetails = $('#panel-details');
 const panelReader  = $('#panel-reader');
 const pdfFrame = $('#pdf-frame');
-const pdfFallback = $('#pdf-fallback');
-const pdfDirect = $('#pdf-direct');
-const openNew = $('#open-new');
+const openNewBtn = $('#open-new');
 
 function renderTabs(){
   tabsEl.innerHTML = LIBRARY.shelves.map(s => `
@@ -63,6 +75,7 @@ tabsEl.addEventListener('click', e=>{
   renderShelves();
   updateTabsSelection();
 });
+
 function updateTabsSelection(){
   $$('button', tabsEl).forEach(b=>b.setAttribute('aria-selected', b.dataset.tab===ACTIVE_SHELF));
 }
@@ -75,6 +88,7 @@ function renderShelves(){
     </div>`;
   }).join('');
 }
+
 function renderBookCard(book){
   const coverStyle = book.img
     ? `style="background-image:url('${book.img}')" data-img="true"`
@@ -95,6 +109,7 @@ function openModalFor(bookId){
   if(!book) return;
   ACTIVE_BOOK = book;
 
+  // Fill details panel
   modalTitleEl.textContent = book.title;
   modalBylineEl.textContent = `by ${book.author}`;
   modalMetaEl.textContent = book.year ? `Published: ${book.year}` : '';
@@ -103,36 +118,62 @@ function openModalFor(bookId){
     ? `url('${book.img}')`
     : `linear-gradient(135deg, ${book.color||'#c4af9a'}, #2a2323)`;
 
+  // PDF control
   const hasPdf = !!book.pdf;
   tabReader.disabled = !hasPdf;
-  openNew.style.visibility = hasPdf ? 'visible':'hidden';
-  if(hasPdf){
-    pdfFrame.src = book.pdf;
-    pdfDirect.href = book.pdf;
-    openNew.href = book.pdf;
+  openNewBtn.style.display = hasPdf ? 'inline-block' : 'none';
+  if(hasPdf) {
+    openNewBtn.onclick = () => window.open(book.pdf, '_blank');
   } else {
-    pdfFrame.removeAttribute('src');
+    openNewBtn.onclick = null;
   }
+
+  // Show details by default, no PDF loaded
+  clearPdf();
   selectPanel('details');
   modalEl.setAttribute('aria-hidden','false');
 }
 
 function selectPanel(which){
-  const isReader = which==='reader';
+  const isReader = which === 'reader';
   tabDetails.setAttribute('aria-selected', !isReader);
   tabReader.setAttribute('aria-selected', isReader);
-  panelDetails.hidden = isReader;
-  panelReader.hidden = !isReader;
+
+  if(isReader) {
+    // Hide details, show PDF panel
+    panelDetails.hidden = true;
+    panelReader.hidden = false;
+    loadPdf();
+  } else {
+    // Hide PDF, show details panel
+    panelDetails.hidden = false;
+    panelReader.hidden = true;
+    clearPdf();
+  }
 }
+
+function loadPdf(){
+  if(ACTIVE_BOOK?.pdf) {
+    pdfFrame.src = ACTIVE_BOOK.pdf;
+  }
+}
+
+function clearPdf(){
+  pdfFrame.removeAttribute('src');
+}
+
 tabDetails.addEventListener('click', ()=>selectPanel('details'));
-tabReader.addEventListener('click', ()=>{ if(!tabReader.disabled) selectPanel('reader'); });
+tabReader.addEventListener('click', ()=>{ 
+  if(!tabReader.disabled) selectPanel('reader');
+});
 
 modalEl.addEventListener('click', e=>{
   if(e.target.hasAttribute('data-close')) closeModal();
 });
+
 function closeModal(){
   modalEl.setAttribute('aria-hidden','true');
-  pdfFrame.removeAttribute('src');
+  clearPdf();
 }
 
 (function init(){
