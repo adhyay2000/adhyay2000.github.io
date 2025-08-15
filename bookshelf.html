@@ -6,7 +6,6 @@
   <title>My Bookshelf</title>
   <link rel="stylesheet" href="assets/css/bookshelf.css"/>
 </head>
-<body>
   <header class="site-header">
     <h1>My Bookshelf</h1>
     <nav id="shelf-tabs" class="tabs" aria-label="Bookshelf Sections"></nav>
@@ -25,9 +24,8 @@
         <div class="modal-tabs" role="tablist" aria-label="View modes">
           <button id="tab-details" class="modal-tab" role="tab" aria-selected="true" data-panel="details">Details</button>
           <button id="tab-reader" class="modal-tab" role="tab" aria-selected="false" data-panel="reader">Read</button>
+          <button id="open-new" class="modal-tab" title="Open PDF in new tab">Open in new tab</button>
         </div>
-        <div class="spacer"></div>
-        <a id="open-new" class="open-new" href="#" target="_blank" rel="noopener">Open in new tab</a>
       </div>
 
       <div class="modal-panels">
@@ -52,7 +50,6 @@
       </div>
     </div>
   </div>
-
   <script src="assets/js/bookshelf.js"></script>
 </body>
 </html>
