@@ -1,45 +1,152 @@
-const LIBRARY = {
-  shelves: [
-    {
-      id: "Research Papers",
-      name: "Research Papers",
-      books: [
-        {
-          id: "paper-1",
-          title: "Large Language Models: A Survey",
-          author: "Shervin Minaee, Tomas Mikolov, Narjes Nikzad, Meysam Chenaghlu, Richard Socher, Xavier Amatriain, Jianfeng Gao",
-          year: 2024,
-          color: "#b26e4b",
-          description: "Large Language Models (LLMs) have drawn a lot of attention due to their strong performance on a wide range of natural language tasks, since the release of ChatGPT in November 2022. LLMs' ability of general-purpose language understanding and generation is acquired by training billions of model's parameters on massive amounts of text data, as predicted by scaling laws \cite{kaplan2020scaling,hoffmann2022training}. The research area of LLMs, while very recent, is evolving rapidly in many different ways. In this paper, we review some of the most prominent LLMs, including three popular LLM families (GPT, LLaMA, PaLM), and discuss their characteristics, contributions and limitations. We also give an overview of techniques developed to build, and augment LLMs. We then survey popular datasets prepared for LLM training, fine-tuning, and evaluation, review widely used LLM evaluation metrics, and compare the performance of several popular LLMs on a set of representative benchmarks. Finally, we conclude the paper by discussing open challenges and future research directions.",
-          pdf: "https://arxiv.org/pdf/2402.06196.pdf"
-        },
-      ]
-    },
-    {
-      id: "non-fiction",
-      name: "Non-Fiction",
-      books: [
-        {
-          id: "nf-1",
-          title: "The Art of Deep Work",
-          author: "Dr. Sarah Kim",
-          year: 2023,
-          color: "#6b4e7a",
-          description: "An exploration of focus and productivity in the digital age, offering practical strategies for cultivating concentration and achieving meaningful work.",
-          pdf: "https://arxiv.org/pdf/2401.12345.pdf"
-        },
-        {
-          id: "nf-2", 
-          title: "Climate Futures",
-          author: "R. Patel & J. Williams",
-          year: 2024,
-          color: "#5a7c4e",
-          description: "A comprehensive look at emerging technologies and social innovations that could help address climate change while building a more sustainable future."
-        }
-      ]
-    }
-  ]
+// Configuration for Google Sheets CSV
+const SHEETS_CONFIG = {
+  CSV_URL: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTvsGbKDMwy_6pzOjhYRzbLP8l7cntBaj13RRJ-dbGZn3b8leTC0ex-K57KL5FVH0hx2rbE_OGK6L1T/pub?gid=0&single=true&output=csv'
 };
+
+// Default colors for book covers
+const BOOK_COLORS = [
+  '#b26e4b', '#4a7c7e', '#986e5a', '#6b4e7a', '#5a7c4e', 
+  '#7a5b6b', '#6b7a5b', '#5b6b7a', '#7a6b5b', '#6b5b7a'
+];
+
+// Initialize empty library
+let LIBRARY = {
+  shelves: []
+};
+
+// Function to parse CSV data
+function parseCSV(csvText) {
+  const lines = csvText.trim().split('\n');
+  const headers = lines[0].split(',').map(h => h.replace(/"/g, '').trim());
+  
+  const books = [];
+  for (let i = 1; i < lines.length; i++) {
+    const values = [];
+    let currentValue = '';
+    let inQuotes = false;
+    
+    // Parse CSV line handling quoted values
+    for (let j = 0; j < lines[i].length; j++) {
+      const char = lines[i][j];
+      if (char === '"') {
+        inQuotes = !inQuotes;
+      } else if (char === ',' && !inQuotes) {
+        values.push(currentValue.trim());
+        currentValue = '';
+      } else {
+        currentValue += char;
+      }
+    }
+    values.push(currentValue.trim()); // Don't forget the last value
+    
+    // Create book object
+    if (values.length >= 2 && values[1]) { // At least id and title
+      const book = {
+        id: values[0] || `book-${i}`,
+        title: values[1] || 'Untitled',
+        author: values[2] || 'Unknown Author',
+        year: values[3] ? parseInt(values[3]) : null,
+        description: values[4] || '',
+        pdf: values[5] || '',
+        color: BOOK_COLORS[(i - 1) % BOOK_COLORS.length]
+      };
+      
+      if (book.title !== 'Untitled') {
+        books.push(book);
+      }
+    }
+  }
+  
+  return books;
+}
+
+// Function to fetch data from Google Sheets CSV
+async function fetchBooksFromSheets() {
+  if (!SHEETS_CONFIG.CSV_URL || SHEETS_CONFIG.CSV_URL === 'YOUR_PUBLISHED_CSV_URL_HERE') {
+    showError('Please update SHEETS_CONFIG.CSV_URL with your published Google Sheets CSV URL');
+    loadSampleData();
+    return;
+  }
+
+  try {
+    showLoadingState(true);
+    const response = await fetch(SHEETS_CONFIG.CSV_URL);
+    
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    
+    const csvText = await response.text();
+    const books = parseCSV(csvText);
+    
+    if (books.length === 0) {
+      throw new Error('No valid books found in the CSV');
+    }
+    
+    // Create library with all books in one shelf
+    LIBRARY.shelves = [{
+      id: "my-library",
+      name: "My Library",
+      books: books
+    }];
+    
+    // Update active shelf
+    ACTIVE_SHELF = LIBRARY.shelves[0]?.id || null;
+    
+    // Re-render the UI
+    renderTabs();
+    renderShelves();
+    showLoadingState(false);
+    
+    console.log(`Successfully loaded ${books.length} books from Google Sheets CSV`);
+    
+  } catch (error) {
+    console.error('Error fetching books from CSV:', error);
+    showLoadingState(false);
+    showError(`Failed to load books: ${error.message}`);
+    
+    // Fallback to sample data
+    loadSampleData();
+  }
+}
+
+// Function to show loading state
+function showLoadingState(isLoading) {
+  if (isLoading) {
+    shelvesEl.innerHTML = '<div style="text-align:center;padding:40px;color:var(--muted);">Loading books from Google Sheets...</div>';
+  }
+}
+
+// Function to show error message
+function showError(message) {
+  shelvesEl.innerHTML = `<div style="text-align:center;padding:40px;color:#ff6b6b;">${message}</div>`;
+}
+
+// Fallback sample data
+function loadSampleData() {
+  LIBRARY = {
+    shelves: [
+      {
+        id: "sample",
+        name: "Sample Books",
+        books: [
+          {
+            id: "sample-1",
+            title: "Configure Your CSV",
+            author: "Setup Guide",
+            year: 2024,
+            color: "#b26e4b",
+            description: "Update SHEETS_CONFIG.CSV_URL with your published Google Sheets CSV URL. Go to File → Share → Publish to web → Choose CSV format.",
+            pdf: ""
+          }
+        ]
+      }
+    ]
+  };
+  ACTIVE_SHELF = LIBRARY.shelves[0]?.id || null;
+  renderTabs();
+  renderShelves();
+}
 
 let ACTIVE_SHELF = LIBRARY.shelves[0]?.id || null;
 let ACTIVE_BOOK = null;
@@ -176,7 +283,30 @@ function closeModal(){
   clearPdf();
 }
 
+// Add refresh button to header
+function addRefreshButton() {
+  const header = $('.site-header');
+  const refreshBtn = document.createElement('button');
+  refreshBtn.innerHTML = '↻ Refresh';
+  refreshBtn.className = 'refresh-btn';
+  refreshBtn.style.cssText = `
+    position: absolute;
+    top: 16px;
+    right: 20px;
+    background: var(--shelf);
+    color: var(--text);
+    border: 1px solid var(--shelf-edge);
+    border-radius: 6px;
+    padding: 8px 12px;
+    cursor: pointer;
+    font-size: 14px;
+  `;
+  refreshBtn.onclick = fetchBooksFromSheets;
+  header.appendChild(refreshBtn);
+}
+
 (function init(){
-  renderTabs();
-  renderShelves();
+  addRefreshButton();
+  // Try to load from Google Sheets first, fallback to sample data
+  fetchBooksFromSheets();
 })();
