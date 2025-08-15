@@ -1,35 +1,60 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>My Bookshelf</title>
-  <link rel="stylesheet" href="assets/css/main.css"> <!-- existing site CSS (optional) -->
-  <link rel="stylesheet" href="assets/css/bookshelf.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Good Reads</title>
+  <link rel="stylesheet" href="styles.css"/>
 </head>
-<body class="is-preload">
-  <div id="bookshelf-app">
-    <header class="bs-header">
-      <h1>My Bookshelf</h1>
-      <div class="bs-search">
-        <input id="bs-search-input" type="search" placeholder="Search title or author…" />
+<body>
+  <header class="site-header">
+    <h1>Good Reads</h1>
+    <nav id="shelf-tabs" class="tabs" aria-label="Bookshelf Sections"></nav>
+  </header>
+
+  <main>
+    <section id="shelves" class="shelves" aria-live="polite"></section>
+  </main>
+
+  <div id="modal" class="modal" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="modal-title">
+    <div class="modal-backdrop" data-close></div>
+    <div class="modal-dialog" role="document">
+      <button class="modal-close" aria-label="Close" data-close>&times;</button>
+
+      <div class="modal-toolbar">
+        <div class="modal-tabs" role="tablist" aria-label="View modes">
+          <button id="tab-details" class="modal-tab" role="tab" aria-selected="true" data-panel="details">Details</button>
+          <button id="tab-reader" class="modal-tab" role="tab" aria-selected="false" data-panel="reader">Read</button>
+        </div>
+        <div class="spacer"></div>
+        <a id="open-new" class="open-new" href="#" target="_blank" rel="noopener">Open in new tab</a>
       </div>
-    </header>
 
-    <nav class="bs-tabs" id="bs-tabs"></nav>
+      <div class="modal-panels">
+        <!-- Details Panel -->
+        <div id="panel-details" class="panel panel-details" role="tabpanel" aria-labelledby="tab-details">
+          <div class="modal-cover" id="modal-cover" aria-hidden="true"></div>
+          <div class="modal-body">
+            <h2 id="modal-title"></h2>
+            <p class="byline" id="modal-byline"></p>
+            <p id="modal-meta" class="meta"></p>
+            <p id="modal-desc"></p>
+          </div>
+        </div>
 
-    <main id="bs-shelves" class="bs-shelves"></main>
-  </div>
-
-  <!-- Modal -->
-  <div id="bs-modal" class="bs-modal" aria-hidden="true">
-    <div class="bs-modal__backdrop" data-close></div>
-    <div class="bs-modal__dialog" role="dialog" aria-modal="true" aria-labelledby="bs-modal-title">
-      <button class="bs-modal__close" data-close aria-label="Close">×</button>
-      <div class="bs-modal__body" id="bs-modal-body"></div>
+        <!-- Reader Panel -->
+        <div id="panel-reader" class="panel panel-reader" role="tabpanel" aria-labelledby="tab-reader" hidden>
+          <div class="pdf-wrap">
+            <iframe id="pdf-frame" class="pdf-frame" title="PDF Reader" loading="lazy" referrerpolicy="no-referrer"></iframe>
+          </div>
+          <div class="pdf-fallback" id="pdf-fallback" hidden>
+            <p>PDF preview unavailable. <a id="pdf-direct" href="#" target="_blank" rel="noopener">Open the PDF directly</a>.</p>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 
-  <script src="assets/js/bookshelf.js"></script>
+  <script src="app.js"></script>
 </body>
 </html>
