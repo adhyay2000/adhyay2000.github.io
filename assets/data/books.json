@@ -1,0 +1,66 @@
+{
+  "shelves": [
+    {
+      "id": "fiction",
+      "name": "Fiction",
+      "books": [
+        {
+          "id": "f1",
+          "title": "The Night Circus",
+          "author": "E. Morgenstern",
+          "cover": "",
+          "year": 2011,
+          "tags": [
+            "fantasy"
+          ],
+          "description": "A phantasmagoric duel in a wandering circus."
+        },
+        {
+          "id": "f2",
+          "title": "Dune",
+          "author": "Frank Herbert",
+          "cover": "",
+          "year": 1965,
+          "tags": [
+            "sci‑fi"
+          ],
+          "description": "Epic sci‑fi politics and sandworms."
+        },
+        {
+          "id": "f3",
+          "title": "1984",
+          "author": "George Orwell",
+          "cover": "",
+          "year": 1949,
+          "tags": [
+            "dystopia"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "tech",
+      "name": "Tech",
+      "books": [
+        {
+          "id": "t1",
+          "title": "Designing Data‑Intensive Apps",
+          "author": "M. Kleppmann",
+          "cover": "",
+          "year": 2017,
+          "tags": [
+            "systems"
+          ],
+          "description": "The bible of distributed data."
+        },
+        {
+          "id": "t2",
+          "title": "Clean Code",
+          "author": "R. Martin",
+          "cover": "",
+          "year": 2008
+        }
+      ]
+    }
+  ]
+}
