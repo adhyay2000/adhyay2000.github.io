@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Aditya Upadhyay - Personal Website</title>
-  <link rel="stylesheet" href="assets/css/main.css"/>
+  <link rel="stylesheet" href="assets/css/bookshelf.css"/>
 </head>
 <body>
   <!-- Header -->
@@ -31,8 +31,9 @@
           <h1>Hello, I'm Aditya Upadhyay</h1>
           <p class="subtitle">Full Stack Developer & Creative Thinker</p>
           <p class="description">
-            I'm passionate about creating beautiful, functional digital experiences that make a difference. 
-            With expertise in modern web technologies and a love for clean design, I bring ideas to life through code.
+            Self-driven software developer with 4 years of experience in building scalable and distributed systems, currently
+specializing in distributed firewall and network security. Passionate about designing reliable systems and solving
+complex technical problems.
           </p>
           <div class="cta-buttons">
             <a href="#projects" class="btn btn-primary" data-section="projects">View My Work</a>
@@ -50,32 +51,36 @@
         <p>A showcase of my recent work and side projects</p>
       </div>
       <div class="card-grid">
-        <div class="card">
-          <h3>Personal Bookshelf</h3>
-          <p class="meta">Web Application • 2024</p>
-          <p>A digital bookshelf application with Google Sheets integration, featuring a beautiful library interface and PDF reading capabilities.</p>
+        <div class="card">          
+          <h3>MapReduce Framework</h3>
+          <p class="meta">OMSCS project</p>
+          <p>Built a MapReduce framework inspired by Google’s OSDI’04 paper, supporting user-
+defined map/reduce functions, worker failure recovery, and duplicate task handling</p>
           <div class="tags">
-            <span class="tag">JavaScript</span>
-            <span class="tag">CSS</span>
-            <span class="tag">Google Sheets API</span>
+            <span class="tag">Python</span>
+            <span class="tag">Hadoop</span>
           </div>
         </div>
-        <div class="card">
-          <h3>Portfolio Website</h3>
-          <p class="meta">Personal Project • 2024</p>
-          <p>A responsive personal portfolio website showcasing my work, built with modern web technologies and thoughtful UX design.</p>
+        <div class="card">          
+          <h3>Distributed File System</h3>
+          <p class="meta">OMSCS project</p>
+          <p>Implemented a distributed file server using sync gRPC for file operations and async
+gRPC for directory listing updates, with client-side caching and invalidation.</p>
           <div class="tags">
-            <span class="tag">HTML</span>
-            <span class="tag">CSS</span>
-            <span class="tag">Responsive Design</span>
+            <span class="tag">C++</span>
+            <span class="tag">gRPC</span>
           </div>
         </div>
-        <div class="card">
-          <h3>Coming Soon</h3>
-          <p class="meta">In Development</p>
-          <p>More exciting projects are on the way. Check back soon to see what I'm working on next!</p>
+        <div class="card">          
+          <h3>Distributed Database (DynamoDB-inspired)</h3>
+          <p class="meta">Course Project</p>
+          <p>Created a distributed database featuring leaderless replication,
+read-repair mechanisms, and automatic partition rebalancing.</p>
           <div class="tags">
-            <span class="tag">Stay Tuned</span>
+            <span class="tag">Python</span>
+            <span class="tag">Spark</span>
+            <span class="tag">Hadoop</span>
+            <span class="tag">Docker</span>            
           </div>
         </div>
       </div>
@@ -89,33 +94,47 @@
       </div>
       <div class="card-grid">
         <div class="card">
-          <h3>Senior Developer</h3>
-          <p class="meta">Tech Company • 2022 - Present</p>
-          <p>Leading development of web applications, mentoring junior developers, and implementing best practices for scalable software architecture.</p>
+          <h3>Senior Engineer</h3>
+          <p class="meta">Eightfold.ai • Feb 2025 - Present</p>
+          <p>• Developed a CSV ingestion and recurring ingestion framework used by the team to onboard customer data
+efficiently</p>
+          <p>• Took ownership of the Oracle Recruiting Cloud adapter for the Eightfold datapath, ensuring reliability and issue
+resolution</p>
           <div class="tags">
-            <span class="tag">Leadership</span>
-            <span class="tag">Full Stack</span>
-            <span class="tag">Mentoring</span>
+            <span class="tag">Python</span>
+            <span class="tag">ORC HCM</span>
           </div>
         </div>
         <div class="card">
-          <h3>Frontend Developer</h3>
-          <p class="meta">Digital Agency • 2020 - 2022</p>
-          <p>Built responsive websites and web applications for various clients, focusing on performance optimization and user experience.</p>
+          <h3>Member of Technical Staff</h3>
+          <p class="meta">Nutanix • July 2021 - Feb 2025</p>
+          <p>• Built an entity synchronization framework to replicate security policies across availability zones via RPCs,
+ensuring consistency and avoiding duplicate updates</p>
+          <p>• Scaled the visualization backend to serve 1M+ data points through WebSockets, achieving a 10x performance
+boost and optimized memory usage by tuning cgroup limits</p>
+          <p>• Refactored critical rule programming modules to reduce on-call incidents and implemented on-call automation
+tools to further lower operational overhead.</p>
+          <p>• Created a proof-of-concept extending Flow Network Security to support VMs on any cloud architecture using
+iptables, replicating all key features including rule programming and visualization.</p>
+          <p>• Developed a prototype using eBPF to block VMs exhibiting unusual traffic patterns, improving security detec-
+tion.</p>
           <div class="tags">
-            <span class="tag">React</span>
-            <span class="tag">JavaScript</span>
-            <span class="tag">UX/UI</span>
+            <span class="tag">Python</span>
+            <span class="tag">Golang</span>
+            <span class="tag">OVS</span>
+            <span class="tag">Springboot</span>
+            <span class="tag">Microsegmentation</span>
+            <span class="tag">eBPF</span>            
           </div>
         </div>
         <div class="card">
-          <h3>Junior Developer</h3>
-          <p class="meta">Startup • 2019 - 2020</p>
-          <p>Started my professional journey contributing to product development, learning modern development practices, and growing technical skills.</p>
+          <h3>Software Development Intern </h3>
+          <p class="meta">Amazon • Jan 2021 - June 2021</p>
+          <p>• Migrated and optimized the search service, improving performance and reliability, and fixed automation tests
+in the build pipeline.</p>
+          <p>• Designed a pipeline leveraging S3 and AWS Lambda for automated data processing to support ML models.</p>
           <div class="tags">
-            <span class="tag">Learning</span>
-            <span class="tag">Growth</span>
-            <span class="tag">Innovation</span>
+            <span class="tag">Java</span>
           </div>
         </div>
       </div>
@@ -186,18 +205,7 @@
         <div class="blog-meta">Posted on December 15, 2024 • 5 min read</div>
         <p>Recently, I built a personal bookshelf application that integrates with Google Sheets. The goal was to create something beautiful and functional that could easily be updated without touching code...</p>
         <a href="#" class="btn btn-secondary">Read More</a>
-      </article>
-      <article class="blog-post">
-        <h3>The Art of Clean Code</h3>
-        <div class="blog-meta">Posted on December 10, 2024 • 8 min read</div>
-        <p>Writing code is easy. Writing clean, maintainable code that others can understand and extend is an art form. Here are some principles I've learned over the years...</p>
-        <a href="#" class="btn btn-secondary">Read More</a>
-      </article>
-      <article class="blog-post">
-        <h3>Why Design Matters in Development</h3>
-        <div class="blog-meta">Posted on December 5, 2024 • 6 min read</div>
-        <p>As developers, we often focus on functionality over form. But great design isn't just about making things look pretty—it's about creating experiences that users love...</p>
-        <a href="#" class="btn btn-secondary">Read More</a>
+        <iframe src="https://docs.google.com/document/d/e/2PACX-1vTtanSBCX0lY5QtHdgCqseeSQBA-iZ1pyF-5AFlzU7WH7Ll8l2b1a_FvWqVR1TxghTvD298btJteHZ-/pub?embedded=true"></iframe>
       </article>
     </section>
   </main>
@@ -205,14 +213,12 @@
   <!-- Footer -->
   <footer class="footer">
     <div class="social-links">
-      <a href="#" title="LinkedIn">💼</a>
-      <a href="#" title="GitHub">⚡</a>
-      <a href="#" title="Twitter">🐦</a>
-      <a href="#" title="Email">📧</a>
+      <a href="https://www.linkedin.com/in/aditya-upadhyay-0b1b61188/" title="LinkedIn">💼</a>
+      <a href="https://github.com/adhyay2000/" title="GitHub">⚡</a>
+      <a href="mailto:adityabundi2000@gmail.com" title="Email">📧</a>
     </div>
-    <p>&copy; 2024 Your Name. All rights reserved.</p>
+    <p>Made with ❤️ by Aditya Upadhyay</p>
   </footer>
-  <script src="assets/js/main.js"></script>
+  <script src="assets/js/bookshelf.js"></script>
 </body>
 </html>
-
