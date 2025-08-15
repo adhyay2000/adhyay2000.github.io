@@ -111,3 +111,8 @@ body {
 .modal-body { padding: 22px; }
 .panel-reader { flex:1; display:flex; }
 .pdf-frame { flex:1; border:none; }
+
+/* Panel visibility - THIS IS THE FIX */
+.panel[hidden] { 
+  display: none !important; 
+}
