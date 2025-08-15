@@ -3,12 +3,12 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Good Reads</title>
+  <title>My Bookshelf</title>
   <link rel="stylesheet" href="assets/css/bookshelf.css"/>
 </head>
 <body>
   <header class="site-header">
-    <h1>Good Reads</h1>
+    <h1>My Bookshelf</h1>
     <nav id="shelf-tabs" class="tabs" aria-label="Bookshelf Sections"></nav>
   </header>
 
@@ -44,9 +44,7 @@
 
         <!-- Reader Panel -->
         <div id="panel-reader" class="panel panel-reader" role="tabpanel" aria-labelledby="tab-reader" hidden>
-          <div class="pdf-wrap">
-            <iframe id="pdf-frame" class="pdf-frame" title="PDF Reader" loading="lazy" referrerpolicy="no-referrer"></iframe>
-          </div>
+          <iframe id="pdf-frame" class="pdf-frame" title="PDF Reader" loading="lazy" referrerpolicy="no-referrer"></iframe>
           <div class="pdf-fallback" id="pdf-fallback" hidden>
             <p>PDF preview unavailable. <a id="pdf-direct" href="#" target="_blank" rel="noopener">Open the PDF directly</a>.</p>
           </div>
