@@ -427,11 +427,11 @@ function houseCost(price){ return Math.max(20000, Math.round(price/2/10000)*1000
 
 // AI difficulty personas
 const PERSONAS = {
-  noob:      { label:'Noob',      buyBuffer:-Infinity, buyProb:0.85, buildChance:0.05, tradeMargin:-100000 },
-  beginner:  { label:'Beginner',  buyBuffer:50000,      buyProb:0,    buildChance:0.25, tradeMargin:0 },
-  mid:       { label:'Mid',       buyBuffer:150000,     buyProb:0,    buildChance:0.55, tradeMargin:50000 },
-  smart:     { label:'Smart',     buyBuffer:250000,     buyProb:0,    buildChance:0.8,  tradeMargin:100000 },
-  excellent: { label:'Excellent', buyBuffer:320000,     buyProb:0,    buildChance:0.95, tradeMargin:150000 },
+  noob:      { label:'Noob',      buyBuffer:-Infinity, buyProb:0.85, buildChance:0.05, tradeMargin:-100000, tradeChance:0 },
+  beginner:  { label:'Beginner',  buyBuffer:50000,      buyProb:0,    buildChance:0.25, tradeMargin:0,       tradeChance:0 },
+  mid:       { label:'Mid',       buyBuffer:150000,     buyProb:0,    buildChance:0.55, tradeMargin:50000,   tradeChance:0.15 },
+  smart:     { label:'Smart',     buyBuffer:250000,     buyProb:0,    buildChance:0.8,  tradeMargin:100000,  tradeChance:0.35 },
+  excellent: { label:'Excellent', buyBuffer:320000,     buyProb:0,    buildChance:0.95, tradeMargin:150000,  tradeChance:0.55 },
 };
 
 // 40-space board, modeled on the classic property-trading board layout, themed around Indian cities.
@@ -1042,7 +1042,12 @@ function checkBankruptcy(p){
 
 function promptSolvency(p){
   if(p.bankrupt) return;
-  if(p.cash >= 0){ renderAll(); return; }
+  if(p.cash >= 0){
+    closeModal();
+    log(`<b>${p.name}</b> raises enough cash to cover it.`);
+    renderAll();
+    return;
+  }
   const deficit = -p.cash;
   const sellable = p.properties.map(i=>BOARD[i]).filter(s=>s.t==='prop' && s.houses>0);
   const mortgageable = p.properties.map(i=>BOARD[i]).filter(s=>!s.mortgaged && s.houses===0);
@@ -1179,22 +1184,36 @@ function aiTakeTurn(){
       setTimeout(()=>{
         if(gameOver) return;
         const p3 = currentPlayer();
-        const doubles = dice[0]===dice[1];
-        if(doubles && !p3.inJail && doublesStreak>0 && doublesStreak<3 && !p3.bankrupt){
-          rolledThisTurn = false;
-          renderAll();
-          aiTakeTurn();
+        if(!p3.bankrupt){
+          aiAttemptTrade(p3, ()=>{ setTimeout(aiFinishTurn, 400); });
         } else {
-          doAdvanceTurn();
-          renderAll();
-          if(!gameOver){
-            const next = currentPlayer();
-            if(next.isAI) setTimeout(aiTakeTurn, 500);
-          }
+          setTimeout(aiFinishTurn, 400);
         }
       }, 550);
     }, 550);
   }, 550);
+}
+
+// Decides whether to roll again (doubles) or hand off to the next player.
+// Called once the AI's post-roll actions (buy/build/trade) are fully resolved —
+// including, potentially, after a human has clicked Accept/Decline on a trade modal.
+function aiFinishTurn(){
+  if(gameOver) return;
+  const p = currentPlayer();
+  if(!p || !p.isAI) return;
+  const doubles = dice[0]===dice[1];
+  if(doubles && !p.inJail && doublesStreak>0 && doublesStreak<3 && !p.bankrupt){
+    rolledThisTurn = false;
+    renderAll();
+    aiTakeTurn();
+  } else {
+    doAdvanceTurn();
+    renderAll();
+    if(!gameOver){
+      const next = currentPlayer();
+      if(next.isAI) setTimeout(aiTakeTurn, 500);
+    }
+  }
 }
 
 // ---------- AI decision-making ----------
@@ -1249,6 +1268,68 @@ function aiEvaluateTrade(ai, offerCash, reqCash, offerProps, reqProps){
     if(guarding) margin += 300000;
   }
   return netGain >= margin;
+}
+
+// Scans color groups for the best trade opportunity for this AI: a group where it owns
+// some but not all properties, with at least one missing piece currently owned (unmortgaged)
+// by someone else. Picks the group it's closest to completing.
+function aiFindTradeOpportunity(player){
+  const myIdx = players.indexOf(player);
+  const groupNames = [...new Set(BOARD.filter(s=>s.t==='prop').map(s=>s.group))];
+  let best = null;
+  groupNames.forEach(g=>{
+    const groupProps = BOARD.filter(s=>s.t==='prop' && s.group===g);
+    const ownedByMe = groupProps.filter(s=>s.owner===myIdx).length;
+    if(ownedByMe===0 || ownedByMe===groupProps.length) return;
+    const missing = groupProps.filter(s=>s.owner!==undefined && s.owner!==myIdx && !s.mortgaged);
+    if(missing.length===0) return;
+    const ratio = ownedByMe/groupProps.length;
+    if(!best || ratio>best.ratio) best = { group:g, ratio, missing };
+  });
+  if(!best) return null;
+
+  const targetProp = best.missing[0];
+  const targetIdx = BOARD.indexOf(targetProp);
+  const target = players[targetProp.owner];
+  if(!target || target===player || target.bankrupt) return null;
+
+  // Offer a premium over face value — nobody hands over a monopoly-completing piece at cost.
+  const premium = player.persona==='excellent' ? 1.6 : 1.35;
+  const offerCash = Math.round(targetProp.price*premium/1000)*1000;
+
+  // Optionally sweeten with a spare property held alone in a group scattered among 2+ other
+  // players, where this AI has little real shot at ever completing the set anyway.
+  let sweetenerIdx = null;
+  const spareCandidates = player.properties.filter(i=>{
+    const s = BOARD[i];
+    if(s.t!=='prop' || s.group===best.group) return false;
+    const groupProps = BOARD.filter(x=>x.t==='prop' && x.group===s.group);
+    const distinctOtherOwners = new Set(groupProps.filter(x=>x.owner!==undefined && x.owner!==myIdx).map(x=>x.owner));
+    return distinctOtherOwners.size>=2;
+  });
+  if(spareCandidates.length>0 && Math.random()<0.5){
+    sweetenerIdx = spareCandidates[0];
+  }
+
+  return {
+    target, targetIdx, offerCash,
+    offerProps: sweetenerIdx!==null ? [sweetenerIdx] : []
+  };
+}
+
+// Entry point called once per AI turn (after building). onDone must always eventually be
+// called exactly once — synchronously if there's nothing to do or the other side is also an
+// AI, or later via the trade-confirm modal's Accept/Decline handlers if the target is human.
+function aiAttemptTrade(player, onDone){
+  const cfg = PERSONAS[player.persona];
+  if(!cfg.tradeChance || Math.random()>cfg.tradeChance){ onDone(); return; }
+  const opp = aiFindTradeOpportunity(player);
+  if(!opp || player.cash < opp.offerCash){ onDone(); return; }
+  const reqProps = [opp.targetIdx];
+  if(!opp.target.isAI){
+    log(`🤖 <b>${player.name}</b> proposes a trade to <b>${opp.target.name}</b> for ${BOARD[opp.targetIdx].name}.`);
+  }
+  showTradeConfirm(player, opp.target, opp.offerCash, 0, opp.offerProps, reqProps, onDone);
 }
 
 // ---------- Modals ----------
@@ -1531,16 +1612,18 @@ function executeTrade(p, target, offerCash, reqCash, offerProps, reqProps){
   log(`<b>${p.name}</b> and <b>${target.name}</b> complete a trade.`);
 }
 
-function showTradeConfirm(p, target, offerCash, reqCash, offerProps, reqProps){
+function showTradeConfirm(p, target, offerCash, reqCash, offerProps, reqProps, onResolved){
   if(target.isAI){
     closeModal();
     if(p.cash<offerCash){
       log(`Trade proposed by <b>${p.name}</b> failed — insufficient funds.`);
+      if(onResolved) onResolved();
       return;
     }
     if(target.cash<reqCash){
       log(`🤖 <b>${target.name}</b> can't cover that trade and declines.`);
       renderAll();
+      if(onResolved) onResolved();
       return;
     }
     const accept = aiEvaluateTrade(target, offerCash, reqCash, offerProps, reqProps);
@@ -1551,6 +1634,7 @@ function showTradeConfirm(p, target, offerCash, reqCash, offerProps, reqProps){
       log(`🤖 <b>${target.name}</b> declines the trade from <b>${p.name}</b>.`);
     }
     renderAll();
+    if(onResolved) onResolved();
     return;
   }
   const offerList = offerProps.map(i=>BOARD[i].name).join(', ') || 'nothing';
@@ -1560,7 +1644,7 @@ function showTradeConfirm(p, target, offerCash, reqCash, offerProps, reqProps){
     <h3>Confirm trade</h3>
     <p><b>${p.name}</b> offers ${fmt(offerCash)} + ${offerList}<br>
     in exchange for <b>${target.name}</b>'s ${fmt(reqCash)} + ${reqList}.</p>
-    <p style="font-size:12.5px;">Pass the device to <b>${target.name}</b> to accept or decline.</p>
+    <p style="font-size:12.5px;">${p.isAI ? `🤖 ${p.name} is waiting on your answer.` : `Pass the device to <b>${target.name}</b> to accept or decline.`}</p>
     <div class="modal-actions">
       <button class="danger" id="declineTrade">Decline</button>
       <button class="primary" id="acceptTrade">Accept</button>
@@ -1569,15 +1653,19 @@ function showTradeConfirm(p, target, offerCash, reqCash, offerProps, reqProps){
   document.getElementById('declineTrade').onclick = ()=>{
     log(`Trade proposed by <b>${p.name}</b> to <b>${target.name}</b> was declined.`);
     closeModal();
+    if(onResolved) onResolved();
   };
   document.getElementById('acceptTrade').onclick = ()=>{
     if(p.cash<offerCash || target.cash<reqCash){
       log(`Trade between <b>${p.name}</b> and <b>${target.name}</b> failed — insufficient funds.`);
-      closeModal(); return;
+      closeModal();
+      if(onResolved) onResolved();
+      return;
     }
     executeTrade(p, target, offerCash, reqCash, offerProps, reqProps);
     closeModal();
     renderAll();
+    if(onResolved) onResolved();
   };
 }
 
