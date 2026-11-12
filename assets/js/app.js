@@ -46,6 +46,13 @@ const PROJECTS = [
     tags: ['HTML', 'CSS', 'JavaScript'],
     link: { href: 'zamindar.html', label: 'Play Now' },
   },
+  {
+    title: 'PlanCAD',
+    meta: 'Personal project',
+    body: 'A browser-based floor plan editor for Indian residential plots: draw or auto-generate plans, check them against local bye-laws and Vastu, estimate materials and cost, export PDF/DXF, and walk through the house in 3D with a sunlight simulation for the Hadoti region.',
+    tags: ['React', 'TypeScript', 'Three.js'],
+    link: { href: 'plancad/', label: 'Open App' },
+  },
 ];
 
 const JOBS = [
